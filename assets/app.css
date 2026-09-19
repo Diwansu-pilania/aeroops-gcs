@@ -1,0 +1,174 @@
+/* =========================================================================
+   AeroOps GCS — shared shell (global nav + drawer + footer + responsive glue)
+   Self-contained (explicit hex, no Tailwind tokens) so it renders identically
+   on all three pages regardless of each page's own tailwind.config.
+   ========================================================================= */
+
+:root {
+  --nav-h: 52px;
+  --footer-h: 34px;
+  --g-bg: #0a0e16;
+  --g-panel: #0b1019;
+  --g-cyan: #00f0ff;
+  --g-green: #10b981;
+  --g-amber: #f59e0b;
+  --g-red: #ef4444;
+  --g-text: #dfe2ee;
+  --g-muted: #9aa4b2;
+  --g-border: rgba(255, 255, 255, 0.12);
+}
+
+/* Material Symbols base (guarantees icons render on every page) */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+}
+
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* ---- Global top navigation ---------------------------------------------- */
+.gnav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.75rem;
+  background: rgba(10, 14, 22, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--g-border);
+  font-family: 'Space Grotesk', 'Geist', system-ui, sans-serif;
+  color: var(--g-text);
+}
+.gnav-left { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.gnav-brand {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: 0.9rem; color: #fff; text-decoration: none; white-space: nowrap;
+}
+.gnav-brand .dot {
+  width: 27px; height: 27px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 240, 255, 0.14);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: var(--g-cyan);
+}
+.gnav-brand .sub { display: none; }
+@media (min-width: 1280px) {
+  .gnav-brand .sub {
+    display: inline; color: var(--g-muted); font-weight: 500;
+    text-transform: none; letter-spacing: 0.02em; font-size: 0.72rem;
+  }
+}
+
+.gnav-tabs { display: none; align-items: center; gap: 0.25rem; margin-left: 0.5rem; }
+@media (min-width: 768px) { .gnav-tabs { display: flex; } }
+.gnav-link {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.35rem 0.7rem; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--g-muted); text-decoration: none;
+  border: 1px solid transparent; white-space: nowrap;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.gnav-link:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.gnav-link.active {
+  color: var(--g-cyan);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+.gnav-status { display: none; }
+@media (min-width: 1024px) {
+  .gnav-status {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  }
+}
+.gnav-chip {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.25rem 0.5rem; border: 1px solid var(--g-border);
+  border-radius: 6px; background: rgba(255, 255, 255, 0.02);
+  white-space: nowrap; font-weight: 600;
+}
+
+.gnav-right { display: flex; align-items: center; gap: 0.4rem; }
+.gnav-icon {
+  display: none; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px; color: var(--g-muted);
+  text-decoration: none; transition: color 0.15s, background 0.15s;
+}
+@media (min-width: 768px) { .gnav-icon { display: inline-flex; } }
+.gnav-icon:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+
+.gnav-burger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 34px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--g-border); color: var(--g-text);
+  background: rgba(255, 255, 255, 0.03);
+}
+@media (min-width: 768px) { .gnav-burger { display: none; } }
+
+/* ---- Mobile drawer ------------------------------------------------------ */
+.gdrawer {
+  position: fixed; inset: var(--nav-h) 0 0 0; z-index: 55;
+  background: rgba(5, 8, 14, 0.97);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem;
+  transform: translateY(-8px); opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.gdrawer.open { opacity: 1; transform: none; pointer-events: auto; }
+@media (min-width: 768px) { .gdrawer { display: none; } }
+.gdrawer a {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.85rem 1rem; border-radius: 10px;
+  color: var(--g-text); text-decoration: none; font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  border: 1px solid var(--g-border); background: rgba(255, 255, 255, 0.02);
+}
+.gdrawer a.active {
+  color: var(--g-cyan); border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.08);
+}
+.gdrawer .gdrawer-status {
+  margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--g-border);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--g-muted);
+}
+.gdrawer .gdrawer-status span { display: flex; align-items: center; gap: 0.35rem; }
+
+/* ---- Responsive workspace + footer glue --------------------------------- */
+/* Below lg: normal document flow (page scrolls, panels stack).
+   lg and up: lock the workspace to the viewport so the HUD fills one screen. */
+.g-workspace { position: relative; width: 100%; }
+@media (min-width: 1024px) {
+  .g-workspace {
+    height: calc(100vh - var(--nav-h) - var(--footer-h));
+    overflow: hidden;
+  }
+}
+
+.g-footer {
+  position: sticky; bottom: 0; z-index: 50;
+  min-height: var(--footer-h);
+  background: rgba(7, 11, 18, 0.95);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--g-border);
+}
+.g-footer .g-footer-scroll { overflow-x: auto; scrollbar-width: none; }
+.g-footer .g-footer-scroll::-webkit-scrollbar { display: none; }

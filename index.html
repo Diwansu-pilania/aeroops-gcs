@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>DRISHTI — Live Flight Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "gcs-bg": "#111317", "gcs-surface": "#16181d", "gcs-surface-low": "#0d0f12",
+          "gcs-border": "#262930", "gcs-border-subtle": "#323640",
+          "gcs-blue": "#00b0ff", "gcs-blue-light": "#70d6ff",
+          "gcs-red": "#e53935", "gcs-red-bright": "#ff3333",
+          "gcs-green": "#00e676", "gcs-green-emerald": "#10b981",
+          "outline": "#849495", "outline-variant": "#262930",
+          "surface": "#111317", "primary": "#00b0ff"
+        },
+        fontFamily: {
+          "mono": ["JetBrains Mono", "monospace"],
+          "sans": ["Geist", "sans-serif"],
+          "display": ["Space Grotesk", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<!-- Shared shell -->
+<link href="assets/app.css" rel="stylesheet">
+<script defer src="assets/nav.js"></script>
+<style>
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #0d0f12; }
+  ::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #00b0ff; }
+  .tactical-grid {
+    background-size: 32px 32px;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  }
+</style>
+</head>
+<body class="bg-gcs-bg text-[#dfe2ee] font-sans antialiased min-h-screen">
+
+<!-- ===== SHARED GLOBAL NAV ===== -->
+<nav class="gnav">
+  <div class="gnav-left">
+    <a class="gnav-brand" href="index.html">
+      <span class="dot"><span class="material-symbols-outlined" style="font-size:18px">radar</span></span>
+      DRISHTI <span class="sub">/ Live Flight Dashboard</span>
+    </a>
+    <div class="gnav-tabs">
+      <a class="gnav-link" data-nav="index" href="index.html"><span class="material-symbols-outlined" style="font-size:16px">flight</span>Dashboard</a>
+      <a class="gnav-link" data-nav="mission" href="mission.html"><span class="material-symbols-outlined" style="font-size:16px">polyline</span>Mission</a>
+      <a class="gnav-link" data-nav="triage" href="triage.html"><span class="material-symbols-outlined" style="font-size:16px">medical_services</span>Triage</a>
+    </div>
+  </div>
+  <div class="gnav-status">
+    <span class="gnav-chip" style="color:#00e676"><span class="material-symbols-outlined" style="font-size:14px">cell_tower</span>LINK 100%</span>
+    <span class="gnav-chip" style="color:#00b0ff"><span class="material-symbols-outlined" style="font-size:14px">satellite_alt</span>3D FIX · 18</span>
+    <span class="gnav-chip" style="color:#00e676"><span class="material-symbols-outlined" style="font-size:14px">battery_charging_full</span>88% · 24.8V</span>
+    <span class="gnav-chip" style="color:#00b0ff">LOITER</span>
+  </div>
+  <div class="gnav-right">
+    <a class="gnav-icon" href="#" title="Settings"><span class="material-symbols-outlined" style="font-size:18px">settings</span></a>
+    <button aria-label="Menu" class="gnav-burger" id="gnavBurger"><span class="material-symbols-outlined">menu</span></button>
+  </div>
+</nav>
+<div class="gdrawer" id="gnavDrawer">
+  <a data-nav="index" href="index.html"><span class="material-symbols-outlined">flight</span>Live Flight Dashboard</a>
+  <a data-nav="mission" href="mission.html"><span class="material-symbols-outlined">polyline</span>Mission Planning</a>
+  <a data-nav="triage" href="triage.html"><span class="material-symbols-outlined">medical_services</span>Survivor Triage</a>
+  <div class="gdrawer-status">
+    <span style="color:#00e676"><span class="material-symbols-outlined" style="font-size:14px">cell_tower</span>LINK 100%</span>
+    <span style="color:#00b0ff"><span class="material-symbols-outlined" style="font-size:14px">satellite_alt</span>GPS 3D · 18</span>
+    <span style="color:#00e676"><span class="material-symbols-outlined" style="font-size:14px">battery_charging_full</span>BATT 88%</span>
+    <span style="color:#00b0ff">MODE LOITER</span>
+  </div>
+</div>
+
+<!-- ===== WORKSPACE ===== -->
+<main class="g-workspace flex flex-col lg:block">
+
+  <!-- MAP: hero on mobile, full-bleed background on desktop -->
+  <div class="relative h-[46vh] sm:h-[54vh] lg:h-full lg:absolute lg:inset-0 z-0 bg-[#0a0c10] overflow-hidden">
+    <img alt="Full-screen satellite aerial GIS surveillance map with runway paths and target coordinates." class="w-full h-full object-cover filter brightness-[0.88] contrast-[1.08] pointer-events-none" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFWqMy6jD2GIpWhZYNE0y6YUBeiVkNGfK7gJydru13II4IcfAcYdSJrD8CGmYLq0J5d_C_e-WBhOqTVdbiSZucQGz-zGq0XGJ2-gt8c-9PO1TQFAjRwQ6XA-qVQRx7Yl5oNTHDaNdKw8fbNkAH_q_e4aqulV8MJjAHnWv5p8N0Y-L4A-_7aWy9P54t_Qi4RfHaeRTcAzvZJiRovpXzxcvW4M8S9bUineUoF6rBq1KrFg4zqxp7PsFs">
+    <div class="absolute inset-0 tactical-grid pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
+    <!-- Vector overlays: viewBox lets them scale with the map at any width -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMid slice">
+      <circle cx="835" cy="388" fill="none" opacity="0.45" r="140" stroke="#00b0ff" stroke-dasharray="4,6" stroke-width="1"></circle>
+      <circle cx="835" cy="388" fill="none" opacity="0.25" r="280" stroke="#00b0ff" stroke-dasharray="2,8" stroke-width="0.8"></circle>
+      <polygon fill="rgba(0, 176, 255, 0.03)" points="460,180 880,140 1020,490 690,620 420,440" stroke="#00b0ff" stroke-dasharray="6,4" stroke-width="1.2"></polygon>
+      <g transform="translate(480, 520)">
+        <circle fill="#111317" r="11" stroke="#00e676" stroke-width="2.5"></circle>
+        <text fill="#00e676" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="4">H</text>
+        <text fill="#00e676" font-family="Geist" font-size="11" font-weight="600" x="16" y="4">HOME BASE</text>
+      </g>
+      <polyline fill="none" points="480,520 540,460 620,430 710,380 790,340" stroke="#00e676" stroke-dasharray="4,4" stroke-width="2"></polyline>
+      <circle cx="540" cy="460" fill="#00e676" r="3"></circle>
+      <circle cx="620" cy="430" fill="#00e676" r="3"></circle>
+      <circle cx="710" cy="380" fill="#00e676" r="3"></circle>
+      <line stroke="#00b0ff" stroke-width="2.5" x1="790" x2="860" y1="340" y2="280"></line>
+      <g transform="translate(790, 340)">
+        <circle class="animate-spin" fill="none" opacity="0.8" r="22" stroke="#00b0ff" stroke-dasharray="4,3" stroke-width="1.5" style="animation-duration: 8s;"></circle>
+        <circle fill="#00b0ff" r="10" stroke="#ffffff" stroke-width="2.5"></circle>
+        <circle fill="#ffffff" r="4"></circle>
+        <polygon fill="#00b0ff" points="0,-16 5,-8 -5,-8"></polygon>
+        <g transform="translate(18, -8)">
+          <rect fill="#111317" fill-opacity="0.9" height="22" rx="3" stroke="#262930" stroke-width="1" width="84"></rect>
+          <text fill="#00b0ff" font-family="JetBrains Mono" font-size="11" font-weight="bold" x="6" y="15">UAV-01</text>
+          <text fill="#00e676" font-family="JetBrains Mono" font-size="10" x="52" y="15">AIR</text>
+        </g>
+      </g>
+      <g transform="translate(680, 240)">
+        <rect fill="rgba(0, 176, 255, 0.15)" height="36" stroke="#00b0ff" stroke-dasharray="3,2" stroke-width="1.5" width="36"></rect>
+        <text fill="#00b0ff" font-family="JetBrains Mono" font-size="10" font-weight="bold" x="0" y="-6">OBJ-01 [94%]</text>
+      </g>
+    </svg>
+    <!-- Zoom / center controls -->
+    <div class="absolute top-3 left-3 lg:left-[336px] z-20 flex flex-col space-y-1.5">
+      <div class="bg-[#0a0e16] border border-outline-variant/80 rounded-lg shadow-2xl flex flex-col overflow-hidden text-gray-200 backdrop-blur-md"><button class="w-8 h-8 flex items-center justify-center hover:bg-[#262930] hover:text-[#00b0ff] text-base font-bold border-b border-outline-variant/40 transition-colors" title="Zoom In">+</button><button class="w-8 h-8 flex items-center justify-center hover:bg-[#262930] hover:text-[#00b0ff] text-base font-bold transition-colors" title="Zoom Out">-</button></div>
+      <button class="w-8 h-8 bg-[#0a0e16] border border-outline-variant/80 rounded-lg shadow-2xl flex items-center justify-center text-gray-300 hover:text-[#00b0ff] hover:bg-[#262930] transition-colors backdrop-blur-md" title="Center on Drone"><span class="material-symbols-outlined text-lg leading-none">my_location</span></button>
+    </div>
+    <!-- Layer switcher -->
+    <div class="absolute top-3 right-3 lg:right-[336px] z-20">
+      <button class="px-2.5 py-1.5 bg-[#0a0e16] border border-outline-variant/80 rounded-lg shadow-2xl text-gray-300 hover:text-[#00b0ff] hover:bg-[#262930] flex items-center space-x-1.5 transition-colors backdrop-blur-md" title="Toggle Map Layers"><span class="material-symbols-outlined text-base leading-none">layers</span><span class="text-[11px] font-mono pr-0.5">SAT (Esri)</span></button>
+    </div>
+    <!-- Bottom floating telemetry (desktop only) -->
+    <div class="hidden xl:flex absolute bottom-6 left-[336px] right-[336px] z-20 justify-center pointer-events-none">
+      <div class="bg-[#0a0e16] border border-outline-variant/80 rounded-md px-4 py-2 flex items-center space-x-6 text-xs font-mono shadow-2xl pointer-events-auto backdrop-blur-md"><div class="flex items-center space-x-2"><span class="text-gray-400">ALT (AGL):</span><span class="text-[#00b0ff] font-bold text-sm">42.5 m</span></div><div class="h-3 w-px bg-[#262930]"></div><div class="flex items-center space-x-2"><span class="text-gray-400">SPEED:</span><span class="text-[#00b0ff] font-bold text-sm">14.2 m/s</span></div><div class="h-3 w-px bg-[#262930]"></div><div class="flex items-center space-x-2"><span class="text-gray-400">DIST TO HOME:</span><span class="text-white font-bold text-sm">240.8 m</span></div><div class="h-3 w-px bg-[#262930]"></div><div class="flex items-center space-x-2"><span class="text-gray-400">MODE:</span><span class="px-2 py-0.5 rounded bg-[#00b0ff]/20 text-[#00b0ff] font-bold text-[11px]">LOITER</span></div></div>
+    </div>
+    <div class="hidden lg:block absolute bottom-1 right-[344px] z-20 px-2 py-0.5 bg-black/70 text-[10px] text-gray-400 rounded pointer-events-none font-sans">Leaflet | Imagery © Esri, Maxar, Earthstar Geographics</div>
+  </div>
+
+  <!-- PANELS: stacked on mobile, floating on desktop (lg:contents dissolves this wrapper) -->
+  <div class="relative z-30 flex flex-col gap-3 p-3 lg:contents">
+
+    <!-- LEFT: flight instrumentation -->
+    <aside class="w-full lg:w-80 lg:absolute lg:top-[64px] lg:left-3 lg:bottom-3 lg:z-30 flex flex-col space-y-2 lg:overflow-y-auto pointer-events-auto lg:pr-1">
+      <div class="w-full py-2 px-3 rounded-lg bg-gcs-red text-white flex items-center justify-between shadow-2xl border border-red-400/40 shrink-0"><div class="flex items-center space-x-2"><span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span><span class="font-display font-bold text-xs tracking-wider uppercase">ARMED / AIRBORNE</span></div><span class="text-[10px] font-mono bg-black/70 px-1.5 py-0.5 rounded border border-outline-variant/40">RTL READY</span></div>
+      <div class="rounded-lg border border-outline-variant/80 bg-[#0a0e16] p-2.5 shadow-2xl backdrop-blur-md"><div class="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-outline-variant/40 pb-1 mb-1.5 flex items-center justify-between"><span>Position Telemetry</span><span class="material-symbols-outlined text-xs text-[#00b0ff]">pin_drop</span></div><div class="space-y-1 text-xs font-mono"><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Latitude:</span><span class="text-gcs-blue font-semibold tracking-wide">37.774921</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Longitude:</span><span class="text-gcs-blue font-semibold tracking-wide">-122.419416</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Altitude (MSL):</span><span class="text-gcs-blue font-semibold tracking-wide">580.2 m</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Altitude (Rel):</span><span class="text-gcs-blue font-semibold tracking-wide">42.5 m</span></div></div></div>
+      <div class="rounded-lg border border-outline-variant/80 bg-[#0a0e16] p-2.5 shadow-2xl backdrop-blur-md"><div class="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-outline-variant/40 pb-1 mb-1.5 flex items-center justify-between"><span>Attitude &amp; Heading</span><span class="material-symbols-outlined text-xs text-[#00b0ff]">explore</span></div><div class="flex items-center justify-between pt-0.5"><div class="relative w-16 h-16 rounded-full border border-gcs-blue/40 bg-black/40 flex items-center justify-center shrink-0 shadow-inner"><span class="absolute top-0.5 text-[8px] font-mono font-bold text-gcs-red">N</span><span class="absolute bottom-0.5 text-[8px] font-mono text-gray-400">S</span><span class="absolute left-1 text-[8px] font-mono text-gray-400">W</span><span class="absolute right-1 text-[8px] font-mono text-gray-400">E</span><div class="w-10 h-10 rounded-full border border-gcs-border flex items-center justify-center"><div class="w-1 h-8 relative rotate-[48deg] flex flex-col items-center justify-between"><div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[8px] border-b-gcs-red"></div><div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[8px] border-t-gray-400"></div></div></div></div><div class="flex-1 pl-3 space-y-1 text-xs font-mono"><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Roll:</span><span class="text-gcs-blue font-semibold">-1.2°</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Pitch:</span><span class="text-gcs-blue font-semibold">+2.4°</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Yaw:</span><span class="text-gcs-blue font-semibold">048.0°</span></div></div></div></div>
+      <div class="rounded-lg border border-outline-variant/80 bg-[#0a0e16] p-2.5 shadow-2xl backdrop-blur-md space-y-2"><div><div class="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-outline-variant/40 pb-1 mb-1.5 flex items-center justify-between"><span>Speed Dynamics</span><span class="material-symbols-outlined text-xs text-[#00b0ff]">speed</span></div><div class="grid grid-cols-2 gap-2 text-xs font-mono"><div class="bg-[#111317]/90 p-1.5 rounded border border-outline-variant/50"><div class="text-gray-400 font-sans text-[10px]">Airspeed</div><div class="text-gcs-blue font-semibold">15.1 m/s</div></div><div class="bg-[#111317]/90 p-1.5 rounded border border-outline-variant/50"><div class="text-gray-400 font-sans text-[10px]">Ground</div><div class="text-gcs-blue font-semibold">14.2 m/s</div></div></div></div><div><div class="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-outline-variant/40 pb-1 mb-1.5 flex items-center justify-between"><span>Battery Status</span><span class="material-symbols-outlined text-xs text-gcs-green">bolt</span></div><div class="space-y-1 text-xs font-mono"><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Voltage / Level:</span><span class="text-gcs-blue font-semibold">24.8V (88%)</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Current Draw:</span><span class="text-gcs-blue font-semibold">18.4 A</span></div></div></div></div>
+      <div class="rounded-lg border border-outline-variant/80 bg-[#0a0e16] p-2.5 shadow-2xl backdrop-blur-md"><div class="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-outline-variant/40 pb-1 mb-1.5 flex items-center justify-between"><span>Navigation &amp; Flight Mode</span><span class="material-symbols-outlined text-xs text-[#00b0ff]">satellite</span></div><div class="space-y-1 text-xs font-mono"><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Fix Type:</span><span class="text-gcs-green font-semibold">3D DGPS (18 Sats)</span></div><div class="flex justify-between items-center"><span class="text-gray-300 font-sans text-[11px]">Mode / Arm:</span><span class="text-gcs-blue font-bold tracking-wide">LOITER <span class="text-gcs-green">(ARMED)</span></span></div></div></div>
+    </aside>
+
+    <!-- RIGHT: computer vision / detected objects -->
+    <aside class="w-full lg:w-80 lg:absolute lg:top-[64px] lg:right-3 lg:bottom-3 lg:z-30 flex flex-col space-y-2 pointer-events-auto lg:overflow-hidden">
+      <div class="rounded-lg border border-outline-variant/80 bg-[#0a0e16] p-3 shadow-2xl flex flex-col lg:flex-1 lg:min-h-0 backdrop-blur-md"><div class="flex items-center justify-between pb-2 border-b border-outline-variant/40 shrink-0"><div class="flex items-center space-x-1.5"><span class="material-symbols-outlined text-sm text-[#00b0ff]">filter_center_focus</span><span class="text-white font-mono text-xs font-bold">Detected Objects</span><span class="px-1.5 py-0.5 rounded-full bg-[#00b0ff]/20 text-[#00b0ff] text-[10px] font-mono font-bold">3</span></div><button class="px-2.5 py-1 bg-gcs-red hover:bg-gcs-red-bright text-white text-[11px] font-medium rounded transition-colors active:scale-95 shadow">Clear All</button></div><div class="flex-1 overflow-y-auto space-y-2 pt-2 pr-0.5"><div class="p-2 bg-black/40 rounded-md border border-outline-variant/60 hover:border-gcs-blue transition-colors shadow-sm"><div class="flex items-center justify-between text-xs font-mono"><span class="text-white font-bold flex items-center space-x-1"><span class="material-symbols-outlined text-sm text-gcs-blue">person</span><span>Person #01</span></span><span class="text-gcs-green font-bold text-[11px]">94% CONF</span></div><div class="mt-1 text-[11px] font-mono text-gray-400 flex justify-between"><span>LAT: 37.7748° N</span><span>LON: 122.4191° W</span></div></div><div class="p-2 bg-black/40 rounded-md border border-outline-variant/60 hover:border-gcs-blue transition-colors shadow-sm"><div class="flex items-center justify-between text-xs font-mono"><span class="text-white font-bold flex items-center space-x-1"><span class="material-symbols-outlined text-sm text-gcs-blue">directions_car</span><span>Vehicle #03</span></span><span class="text-gcs-green font-bold text-[11px]">88% CONF</span></div><div class="mt-1 text-[11px] font-mono text-gray-400 flex justify-between"><span>LAT: 37.7753° N</span><span>LON: 122.4188° W</span></div></div><div class="p-2 bg-black/40 rounded-md border border-outline-variant/60 hover:border-gcs-blue transition-colors shadow-sm"><div class="flex items-center justify-between text-xs font-mono"><span class="text-white font-bold flex items-center space-x-1"><span class="material-symbols-outlined text-sm text-gcs-blue">apartment</span><span>Structure #08</span></span><span class="text-gcs-green font-bold text-[11px]">91% CONF</span></div><div class="mt-1 text-[11px] font-mono text-gray-400 flex justify-between"><span>LAT: 37.7745° N</span><span>LON: 122.4202° W</span></div></div></div><div class="mt-2 pt-2 border-t border-outline-variant/40 shrink-0"><div class="flex justify-between items-center mb-1.5"><span class="text-[10px] font-mono text-gray-300 uppercase flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-gcs-red animate-pulse"></span><span>LIVE GIMBAL OPTICS</span></span><span class="text-[10px] font-mono text-gcs-blue">ZOOM 3.2X</span></div><div class="relative w-full h-24 rounded bg-black border border-outline-variant/50 overflow-hidden shadow-inner"><img alt="Live drone optical camera gimbal feed" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0X2jk2n-xAnZSBgwI-H25kLTaH4XLLg54bfUGUNblus3EuohqS__N-O8ZhZRuZKekysSO-CVet9n5uW8erz29C2w2AvbVllvWqj_8z8JINyIS44Y2Ma2pFupiSPD3xJsFSZ6YHgGUM6daaSBAKQz4Uuv-jQqp2-9sx59W_VlqyiME0NnCyfI3UmQOnMBsgLXj3Z4ejRdXQh0uer1S_rwABZAj5eT2tvgNQ8F0JphYpYN0zSave6an"><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><div class="w-6 h-6 border border-gcs-blue/80"></div></div></div></div></div>
+    </aside>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="g-footer flex items-center px-4 text-[11px] font-mono text-gray-400">
+  <div class="g-footer-scroll flex items-center space-x-2 whitespace-nowrap w-full">
+    <span class="text-gcs-green font-semibold">STATUS: OK</span><span class="text-outline-variant">|</span>
+    <span>915MHz RSSI: <strong class="text-white">-68dBm</strong></span><span class="text-outline-variant">|</span>
+    <span>LATENCY: <strong class="text-gcs-blue">18ms</strong></span><span class="text-outline-variant">|</span>
+    <span>PACKET LOSS: <strong class="text-white">0.00%</strong></span><span class="text-outline-variant">|</span>
+    <span>UPTIME: 00:24:12</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DRISHTI — Mission Planning &amp; Survey</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with CDN Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "tertiary-fixed": "#62ff96", "error-container": "#93000a", "surface-container-highest": "#31353e",
+          "on-background": "#dfe2ee", "on-tertiary": "#003918", "on-tertiary-container": "#006e35",
+          "surface-variant": "#31353e", "on-primary": "#00363a", "primary-fixed-dim": "#00dbe9",
+          "surface-container-lowest": "#0a0e16", "on-tertiary-fixed-variant": "#005226", "on-secondary": "#002a78",
+          "surface-bright": "#353942", "surface": "#0f131c", "tertiary": "#dbffde",
+          "on-secondary-container": "#cdd7ff", "surface-tint": "#00dbe9", "background": "#0f131c",
+          "secondary-fixed-dim": "#b4c5ff", "inverse-primary": "#006970", "on-error": "#690005",
+          "error": "#ffb4ab", "surface-container": "#1c2028", "surface-container-low": "#181c24",
+          "tertiary-container": "#34f885", "inverse-on-surface": "#2c3039", "on-primary-fixed": "#002022",
+          "on-error-container": "#ffdad6", "secondary-container": "#0053db", "on-surface-variant": "#b9cacb",
+          "on-primary-container": "#006970", "on-tertiary-fixed": "#00210b", "outline": "#849495",
+          "secondary-fixed": "#dbe1ff", "surface-dim": "#0f131c", "on-surface": "#dfe2ee",
+          "secondary": "#b4c5ff", "tertiary-fixed-dim": "#00e475", "primary-container": "#00f0ff",
+          "outline-variant": "#3b494b", "primary-fixed": "#7df4ff", "surface-container-high": "#262a33",
+          "inverse-surface": "#dfe2ee", "on-secondary-fixed-variant": "#003ea8", "primary": "#dbfcff",
+          "on-secondary-fixed": "#00174b", "on-primary-fixed-variant": "#004f54"
+        },
+        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+        "spacing": { "space-xl": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "0.75rem", "space-lg": "1rem", "gutter": "0.75rem", "margin": "1rem" },
+        "fontFamily": {
+          "label-md": ["JetBrains Mono"], "telemetry-unit": ["JetBrains Mono"], "headline-md": ["Space Grotesk"],
+          "headline-xl": ["Space Grotesk"], "telemetry-display": ["JetBrains Mono"], "body-sm": ["Geist"],
+          "body-md": ["Geist"], "label-lg": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"],
+          "body-lg": ["Geist"], "label-sm": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+          "telemetry-unit": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+          "headline-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+          "headline-xl": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+          "telemetry-display": ["28px", { "lineHeight": "32px", "fontWeight": "700" }],
+          "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+          "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+          "label-lg": ["14px", { "lineHeight": "18px", "fontWeight": "600" }],
+          "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+          "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }]
+        }
+      }
+    }
+  }
+</script>
+<!-- Shared shell -->
+<link href="assets/app.css" rel="stylesheet"/>
+<script defer src="assets/nav.js"></script>
+<style>
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #0a0e16; }
+  ::-webkit-scrollbar-thumb { background: #262a33; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+  @keyframes pulse-cyan {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.8)); }
+    50% { opacity: 0.4; filter: drop-shadow(0 0 1px rgba(0, 240, 255, 0.2)); }
+  }
+  .drone-radar-ping { animation: pulse-cyan 1.6s infinite ease-in-out; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen font-body-sm">
+
+<!-- ===== SHARED GLOBAL NAV ===== -->
+<nav class="gnav">
+  <div class="gnav-left">
+    <a class="gnav-brand" href="index.html">
+      <span class="dot"><span class="material-symbols-outlined" style="font-size:18px">radar</span></span>
+      DRISHTI <span class="sub">/ Mission Planning &amp; Survey</span>
+    </a>
+    <div class="gnav-tabs">
+      <a class="gnav-link" data-nav="index" href="index.html"><span class="material-symbols-outlined" style="font-size:16px">flight</span>Dashboard</a>
+      <a class="gnav-link" data-nav="mission" href="mission.html"><span class="material-symbols-outlined" style="font-size:16px">polyline</span>Mission</a>
+      <a class="gnav-link" data-nav="triage" href="triage.html"><span class="material-symbols-outlined" style="font-size:16px">medical_services</span>Triage</a>
+    </div>
+  </div>
+  <div class="gnav-status">
+    <span class="gnav-chip" style="color:#00e475"><span class="material-symbols-outlined" style="font-size:14px">cell_tower</span>LINK 100%</span>
+    <span class="gnav-chip" style="color:#00f0ff"><span class="material-symbols-outlined" style="font-size:14px">satellite_alt</span>3D FIX · 18</span>
+    <span class="gnav-chip" style="color:#00e475"><span class="material-symbols-outlined" style="font-size:14px">battery_charging_full</span>88% · 24.8V</span>
+    <span class="gnav-chip" style="color:#00f0ff">AUTO SURVEY</span>
+  </div>
+  <div class="gnav-right">
+    <a class="gnav-icon" href="#" title="Settings"><span class="material-symbols-outlined" style="font-size:18px">settings</span></a>
+    <button aria-label="Menu" class="gnav-burger" id="gnavBurger"><span class="material-symbols-outlined">menu</span></button>
+  </div>
+</nav>
+<div class="gdrawer" id="gnavDrawer">
+  <a data-nav="index" href="index.html"><span class="material-symbols-outlined">flight</span>Live Flight Dashboard</a>
+  <a data-nav="mission" href="mission.html"><span class="material-symbols-outlined">polyline</span>Mission Planning</a>
+  <a data-nav="triage" href="triage.html"><span class="material-symbols-outlined">medical_services</span>Survivor Triage</a>
+  <div class="gdrawer-status">
+    <span style="color:#00e475"><span class="material-symbols-outlined" style="font-size:14px">cell_tower</span>LINK 100%</span>
+    <span style="color:#00f0ff"><span class="material-symbols-outlined" style="font-size:14px">satellite_alt</span>GPS 3D · 18</span>
+    <span style="color:#00e475"><span class="material-symbols-outlined" style="font-size:14px">battery_charging_full</span>BATT 88%</span>
+    <span style="color:#00f0ff">AUTO SURVEY</span>
+  </div>
+</div>
+
+<!-- ===== WORKSPACE ===== -->
+<main class="g-workspace flex flex-col lg:block">
+
+  <!-- MAP -->
+  <div class="relative h-[46vh] sm:h-[54vh] lg:h-full lg:absolute lg:inset-0 z-0 overflow-hidden">
+    <img alt="Tactical satellite orthomosaic of disaster search response zone Alpha" class="absolute inset-0 w-full h-full object-cover filter brightness-[0.70] contrast-[1.15] pointer-events-none" src="https://imgs.search.brave.com/-vThqDUQTwv7gi8ixNEaBiAQ-RoAx8oQli_-aGfAgfM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/dXNhdG9kYXkuY29t/L2djZG4vYXV0aG9y/aW5nL2F1dGhvcmlu/Zy1pbWFnZXMvMjAy/NS8wNy8wOC9VU0FU/Lzg0NTEzMDUzMDA3/LTgyMzYuanBnP3dp/ZHRoPTY2MCZoZWln/aHQ9NDQ0JmZpdD1j/cm9wJmZvcm1hdD1w/anBnJmF1dG89d2Vi/cA"/>
+    <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern height="40" id="surveyGrid" patternUnits="userSpaceOnUse" width="40"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0, 240, 255, 0.12)" stroke-width="0.8"></path></pattern>
+        <pattern height="16" id="hazardStripe" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse" width="16"><line stroke="rgba(255, 51, 75, 0.4)" stroke-width="6" x1="0" x2="0" y1="0" y2="16"></line></pattern>
+      </defs>
+      <polygon fill="rgba(0, 240, 255, 0.05)" points="410,120 980,105 1030,510 440,550" stroke="#00f0ff" stroke-dasharray="6,4" stroke-width="1.8"></polygon>
+      <polygon fill="url(#surveyGrid)" points="410,120 980,105 1030,510 440,550"></polygon>
+      <path d="M 460,165 L 940,150 L 950,230 L 680,240" fill="none" stroke="#00e475" stroke-width="2.5"></path>
+      <line stroke="#00f0ff" stroke-dasharray="3,3" stroke-width="2.5" x1="680" x2="745" y1="240" y2="242"></line>
+      <path d="M 745,242 L 480,248 L 490,320 L 960,310 L 970,395 L 510,405 L 520,480 L 980,470" fill="none" stroke="rgba(0, 240, 255, 0.4)" stroke-dasharray="5,4" stroke-width="1.5"></path>
+      <circle cx="460" cy="165" fill="#181c24" r="10" stroke="#00e475" stroke-width="1.5"></circle><text fill="#00e475" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle" x="460" y="169">1</text>
+      <circle cx="940" cy="150" fill="#181c24" r="10" stroke="#00e475" stroke-width="1.5"></circle><text fill="#00e475" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle" x="940" y="154">2</text>
+      <circle class="drone-radar-ping" cx="480" cy="248" fill="#0f131c" r="12" stroke="#00f0ff" stroke-width="2"></circle><text fill="#00f0ff" font-family="JetBrains Mono" font-size="11" font-weight="bold" text-anchor="middle" x="480" y="252">3</text>
+      <circle cx="490" cy="320" fill="#181c24" r="9" stroke="#849495" stroke-width="1"></circle><text fill="#dfe2ee" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="490" y="323">4</text>
+      <circle cx="960" cy="310" fill="#181c24" r="9" stroke="#849495" stroke-width="1"></circle><text fill="#dfe2ee" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="960" y="313">5</text>
+      <circle cx="970" cy="395" fill="#181c24" r="9" stroke="#849495" stroke-width="1"></circle><text fill="#dfe2ee" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="970" y="398">6</text>
+      <g transform="translate(745, 242) rotate(182)"><line stroke="#00f0ff" stroke-dasharray="4,2" stroke-width="2" x1="0" x2="0" y1="0" y2="45"></line><circle cx="0" cy="45" fill="#00f0ff" r="2.5"></circle><circle cx="0" cy="0" fill="rgba(15, 19, 28, 0.9)" r="16" stroke="#00f0ff" stroke-width="2"></circle><polygon fill="#00f0ff" points="0,-10 8,8 0,4 -8,8"></polygon></g>
+      <g><line stroke="#ff334b" stroke-dasharray="6,4" stroke-width="3" x1="580" x2="810" y1="430" y2="465"></line><rect fill="url(#hazardStripe)" height="55" opacity="0.7" rx="4" stroke="#ff334b" stroke-width="1" width="250" x="570" y="420"></rect></g>
+      <g><circle cx="860" cy="200" fill="rgba(0, 83, 219, 0.25)" r="34" stroke="#0053db" stroke-dasharray="4,2" stroke-width="1.5"></circle></g>
+    </svg>
+
+    <!-- Floating map labels (desktop only — pixel positioned) -->
+    <div class="hidden lg:flex absolute top-4 left-[348px] z-20 bg-[#0a0e16]/90 backdrop-blur-md border border-primary-container px-3 py-1.5 items-center space-x-3 pointer-events-auto shadow-lg"><div class="w-2 h-2 bg-primary-container animate-pulse"></div><div><span class="font-label-sm text-xs text-primary font-bold tracking-tight">SURVEY ZONE ALPHA</span><div class="font-telemetry-unit text-telemetry-unit text-on-surface-variant">DIMENSIONS: 420m × 310m | AREA: 28,750 m²</div></div></div>
+    <div class="hidden lg:flex absolute top-[calc(46%)] left-[42%] z-20 bg-error-container/90 border border-error px-2.5 py-1 items-center space-x-1.5 shadow-xl pointer-events-auto"><span class="material-symbols-outlined text-xs text-error font-bold">warning</span><span class="font-label-sm text-xs text-on-error font-bold tracking-wide">DOWNED POWER LINE - HIGH HAZARD</span></div>
+    <div class="hidden xl:flex absolute top-4 right-[72px] z-20 bg-[#0a0e16]/90 backdrop-blur-md border border-outline-variant/80 px-3 py-1.5 items-center space-x-3 shadow-lg pointer-events-auto text-xs font-label-sm"><div class="flex items-center space-x-1.5"><span class="material-symbols-outlined text-xs text-primary-container">radar</span><span class="text-on-surface-variant">Coverage:</span><span class="text-primary-container font-bold font-mono">64.0%</span></div><span class="text-outline-variant">|</span><div class="flex items-center space-x-1"><span class="text-on-surface-variant">Est. Remaining:</span><span class="text-tertiary-fixed-dim font-bold font-mono">06:45</span></div><span class="text-outline-variant">|</span><div class="flex items-center space-x-1"><span class="text-on-surface-variant">Res. Batt:</span><span class="text-tertiary-fixed-dim font-bold font-mono">28.5%</span></div></div>
+
+    <!-- Right map toolbar (desktop only) -->
+    <div class="hidden lg:flex absolute top-4 right-4 z-20 flex-col space-y-1.5 bg-[#0a0e16]/90 backdrop-blur border border-outline-variant/80 p-1 shadow-lg pointer-events-auto"><button class="p-1.5 hover:bg-surface-container text-primary-container transition-colors" title="Layer: Satellite"><span class="material-symbols-outlined text-sm">layers</span></button><button class="p-1.5 hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Thermal Infrared"><span class="material-symbols-outlined text-sm">thermostat</span></button><div class="h-px bg-outline-variant my-0.5"></div><button class="p-1.5 hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Zoom In"><span class="material-symbols-outlined text-sm">add</span></button><button class="p-1.5 hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Zoom Out"><span class="material-symbols-outlined text-sm">remove</span></button><button class="p-1.5 hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Recenter UAV"><span class="material-symbols-outlined text-sm">my_location</span></button></div>
+
+    <!-- Bottom scan-speed bar (desktop only) -->
+    <div class="hidden lg:flex absolute bottom-4 left-4 z-20 bg-[#0a0e16]/90 backdrop-blur border border-outline-variant/80 px-3 py-1.5 items-center space-x-3 text-xs font-label-sm"><span class="text-on-surface-variant">Active Scan Speed: <strong class="text-primary font-bold">5.5 m/s</strong></span><span class="text-outline-variant">|</span><span class="text-on-surface-variant">Est. Area Scanned: <strong class="text-tertiary-fixed-dim font-bold">18,400 m²</strong></span><span class="text-outline-variant">|</span><span class="text-on-surface-variant">Wind: <strong class="text-on-surface">3.2 kts ENE</strong></span></div>
+  </div>
+
+  <!-- PANELS -->
+  <div class="relative z-30 flex flex-col gap-2.5 p-3 lg:contents">
+    <div class="w-full lg:w-80 lg:absolute lg:top-16 lg:left-4 lg:z-30 lg:max-h-[calc(100vh-8rem)] flex flex-col space-y-2.5 lg:overflow-y-auto lg:pr-1 pointer-events-auto">
+
+      <!-- Drone status -->
+      <div class="bg-[#0c1017]/95 backdrop-blur-md border border-outline-variant/80 p-2.5 shadow-xl"><div class="flex items-center justify-between"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-primary-container text-base">radar</span><div><div class="font-headline-md text-xs font-bold text-primary tracking-wide">UAV-X9 FALCON</div><p class="font-label-sm text-[10px] text-tertiary-fixed-dim">ARMED / AIRBORNE</p></div></div><div class="flex items-center space-x-1.5"><span class="inline-block w-2 h-2 rounded-full bg-tertiary-fixed-dim drone-radar-ping"></span><span class="font-label-sm text-[10px] text-on-surface-variant font-mono">35m AGL</span></div></div></div>
+
+      <!-- Survey grid generator -->
+      <div class="bg-[#0c1017]/95 backdrop-blur-md border border-outline-variant/80 p-3 space-y-2.5 shadow-xl">
+        <div class="flex items-center justify-between border-b border-outline-variant/60 pb-1.5"><span class="font-label-sm text-xs text-primary-container flex items-center space-x-1.5 font-bold tracking-tight"><span class="material-symbols-outlined text-xs">polyline</span><span>SURVEY GRID GENERATOR</span></span><span class="font-label-sm text-[10px] text-tertiary-fixed-dim bg-surface-container-lowest px-1.5 py-0.5 border border-outline-variant/60">AUTO SAR</span></div>
+        <div><label class="font-body-sm text-[11px] text-on-surface-variant block mb-1">Search Boundary Tool</label><div class="grid grid-cols-2 gap-1.5"><button class="py-1 px-2 bg-surface-container-high border border-primary-container text-primary-container font-label-sm text-xs flex items-center justify-center space-x-1 shadow-sm"><span class="material-symbols-outlined text-xs">crop_square</span><span>BBox (Alpha)</span></button><button class="py-1 px-2 bg-surface-container-lowest border border-outline-variant hover:border-primary-container text-on-surface font-label-sm text-xs flex items-center justify-center space-x-1 transition-colors"><span class="material-symbols-outlined text-xs">draw</span><span>Polygon</span></button></div></div>
+        <div class="grid grid-cols-2 gap-1.5"><div><label class="font-body-sm text-[11px] text-on-surface-variant block mb-1">Flight Alt (AGL)</label><div class="flex items-center bg-surface-container-lowest border border-outline-variant px-2 py-1"><input class="w-full bg-transparent border-0 p-0 text-on-surface font-label-sm text-xs focus:ring-0" type="number" value="35"/><span class="font-telemetry-unit text-telemetry-unit text-outline ml-1">m</span></div></div><div><label class="font-body-sm text-[11px] text-on-surface-variant block mb-1">Pattern</label><select class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-label-sm text-xs p-1 focus:border-primary-container focus:ring-0"><option selected="">Lawnmower</option><option>Crosshatch</option></select></div></div>
+        <div class="space-y-1 bg-surface-container-lowest/80 p-2 border border-outline-variant/60"><div class="flex justify-between items-center text-xs"><span class="font-body-sm text-[11px] text-on-surface-variant">Grid Spacing / Lane Width</span><span class="font-label-sm text-xs text-primary-container font-bold">40m</span></div><input class="w-full accent-primary-container h-1 bg-surface-container-high rounded-none" max="100" min="20" type="range" value="40"/><div class="flex justify-between text-[10px] font-telemetry-unit text-outline"><span>20m (Tight)</span><span>GSD: 1.2 cm/px</span><span>100m (Fast)</span></div></div>
+        <div class="pt-1 space-y-1.5"><button class="w-full py-1.5 bg-primary-container text-on-primary-container font-label-sm text-xs font-bold tracking-tight uppercase hover:brightness-110 flex items-center justify-center space-x-1.5 shadow-sm active:scale-95 transition-transform"><span class="material-symbols-outlined text-xs">auto_awesome</span><span>Generate Grid Waypoints</span></button><div class="grid grid-cols-2 gap-1.5"><button class="py-1 px-2 bg-surface-container-high border border-tertiary-fixed-dim text-tertiary-fixed-dim font-label-sm text-xs hover:brightness-110 flex items-center justify-center space-x-1 transition-colors"><span class="material-symbols-outlined text-xs">cloud_upload</span><span>Upload</span></button><button class="py-1 px-2 bg-surface-container-high border border-outline-variant text-on-surface-variant font-label-sm text-xs hover:border-error hover:text-error flex items-center justify-center space-x-1 transition-colors"><span class="material-symbols-outlined text-xs">delete_sweep</span><span>Clear</span></button></div></div>
+      </div>
+
+      <!-- Scan sequence -->
+      <div class="bg-[#0c1017]/95 backdrop-blur-md border border-outline-variant/80 p-2.5 shadow-xl"><div class="flex justify-between items-center pb-1.5 border-b border-outline-variant/60 mb-2"><span class="font-label-sm text-xs text-primary font-semibold flex items-center space-x-1"><span class="material-symbols-outlined text-xs text-primary-container">navigation</span><span>SCAN SEQUENCE (12 WPs)</span></span><span class="font-label-sm text-[10px] text-tertiary-fixed-dim font-mono">EST: 11.2 MIN</span></div><div class="space-y-1 max-h-36 overflow-y-auto pr-1">
+        <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-surface-container-lowest border-l-2 border-primary-container text-on-surface"><div class="flex items-center space-x-1.5"><span class="font-label-sm text-xs text-primary-container font-bold">WP01</span><span class="text-outline font-telemetry-unit text-telemetry-unit">INGRESS</span></div><span class="font-label-sm text-xs text-on-surface">35m AGL</span><span class="font-telemetry-unit text-telemetry-unit text-tertiary-fixed-dim">PASSED</span></div>
+        <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-surface-container-lowest border-l-2 border-primary-container text-on-surface"><div class="flex items-center space-x-1.5"><span class="font-label-sm text-xs text-primary-container font-bold">WP02</span><span class="text-outline font-telemetry-unit text-telemetry-unit">SCAN L1</span></div><span class="font-label-sm text-xs text-on-surface">35m AGL</span><span class="font-telemetry-unit text-telemetry-unit text-tertiary-fixed-dim">PASSED</span></div>
+        <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-surface-container-high border-l-2 border-tertiary-fixed-dim text-primary"><div class="flex items-center space-x-1.5"><span class="font-label-sm text-xs text-tertiary-fixed-dim font-bold animate-pulse">▶ WP03</span><span class="text-primary-container font-telemetry-unit text-telemetry-unit">TURN 85°</span></div><span class="font-label-sm text-xs text-primary font-bold">35m AGL</span><span class="font-telemetry-unit text-telemetry-unit text-tertiary-fixed-dim font-bold">CURRENT</span></div>
+        <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-surface-container-lowest border-l-2 border-outline-variant text-on-surface-variant"><div class="flex items-center space-x-1.5"><span class="font-label-sm text-xs font-bold">WP04</span><span class="text-outline font-telemetry-unit text-telemetry-unit">SCAN L2</span></div><span class="font-label-sm text-xs">35m AGL</span><span class="font-telemetry-unit text-telemetry-unit text-outline">PENDING</span></div>
+        <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-surface-container-lowest border-l-2 border-outline-variant text-on-surface-variant"><div class="flex items-center space-x-1.5"><span class="font-label-sm text-xs font-bold">WP05</span><span class="text-outline font-telemetry-unit text-telemetry-unit">TURN 90°</span></div><span class="font-label-sm text-xs">35m AGL</span><span class="font-telemetry-unit text-telemetry-unit text-outline">PENDING</span></div>
+      </div></div>
+
+      <!-- Hold RTL -->
+      <div class="bg-[#0c1017]/95 backdrop-blur-md border border-outline-variant/80 p-2 shadow-xl"><button class="w-full py-2 bg-error-container text-on-error border border-error font-label-sm text-xs font-bold uppercase tracking-wider hover:brightness-110 flex items-center justify-center space-x-1.5 active:scale-95 transition-transform"><span class="material-symbols-outlined text-xs">home_pin</span><span>HOLD RTL (RETURN HOME)</span></button></div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="g-footer flex items-center px-4">
+  <div class="g-footer-scroll flex items-center space-x-3 whitespace-nowrap w-full">
+    <div class="flex items-center space-x-1.5 text-tertiary-fixed-dim text-xs font-label-sm font-semibold"><span class="inline-block w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span><span>STATUS: OK</span></div>
+    <span class="text-outline-variant">|</span>
+    <span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant font-mono">ALT: 35.2m AGL (124m MSL) | SPEED: 5.5 m/s | DIST TO HOME: 342m | MODE: AUTO (SURVEY) | RSSI: -68 dBm | LATENCY: 18ms | UPTIME: 00:14:22</span>
+  </div>
+</footer>
+
+</body>
+</html>
