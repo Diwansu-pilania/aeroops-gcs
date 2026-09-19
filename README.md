@@ -1,4 +1,4 @@
-# AeroOps GCS
+# DRISHTI
 
 A responsive, multi-page **Ground Control Station** UI, stitched together from three separate design files into one clickable, Vercel-ready static site.
 
